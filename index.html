@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blox Fruits Script Hub</title>
+  <script defer>
+    window.onload = function () { loadScripts(); };
+    function saveScript() {
+      const code = document.getElementById("serverCode").value.trim();
+      const script = document.getElementById("scriptInput").value.trim();
+      if (!code || !script) { alert("يرجى إدخال كود السيرفر والسكربت."); return; }
+      const saved = JSON.parse(localStorage.getItem("bloxScripts") || "{}");
+      saved[code] = script;
+      localStorage.setItem("bloxScripts", JSON.stringify(saved));
+      loadScripts();
+      alert("تم حفظ السكربت بنجاح.");
+    }
+    function loadScripts() {
+      const list = document.getElementById("savedScripts");
+      list.innerHTML = "";
+      const saved = JSON.parse(localStorage.getItem("bloxScripts") || "{}");
+      for (let code in saved) {
+        const li = document.createElement("li");
+        li.className = "bg-gray-700 p-3 rounded flex justify-between items-center";
+        li.innerHTML = `
+          <span class="font-mono">${code}</span>
+          <div class="space-x-2">
+            <button onclick="loadToEditor('${code}')" class="bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded text-sm">تحميل للمحرر</button>
+            <button onclick="downloadSpecificScript('${code}')" class="bg-green-500 hover:bg-green-600 px-3 py-1 rounded text-sm">تنزيل</button>
+            <button onclick="deleteScript('${code}')" class="bg-red-600 hover:bg-red-700 px-3 py-1 rounded text-sm">حذف</button>
+          </div>`;
+        list.appendChild(li);
+      }
+    }
+    function loadToEditor(code) {
+      const saved = JSON.parse(localStorage.getItem("bloxScripts") || "{}");
+      document.getElementById("serverCode").value = code;
+      document.getElementById("scriptInput").value = saved[code] || "";
+    }
+    function downloadScript() {
+      const code = document.getElementById("serverCode").value.trim();
+      const script = document.getElementById("scriptInput").value.trim();
+      if (!code || !script) { alert("يرجى إدخال كود السيرفر والسكربت أولاً."); return; }
+      const blob = new Blob([script], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${code}.lua`;
+      link.click();
+    }
+    function downloadSpecificScript(code) {
+      const saved = JSON.parse(localStorage.getItem("bloxScripts") || "{}");
+      const script = saved[code];
+      const blob = new Blob([script], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${code}.lua`;
+      link.click();
+    }
+    function deleteScript(code) {
+      const saved = JSON.parse(localStorage.getItem("bloxScripts") || "{}");
+      delete saved[code];
+      localStorage.setItem("bloxScripts", JSON.stringify(saved));
+      loadScripts();
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+  <h1 class="text-3xl font-bold mb-4">سجل سكربتات Blox Fruits</h1>
+  <div class="w-full max-w-3xl bg-gray-800 rounded-xl p-6 shadow-lg">
+    <label class="block mb-2 text-lg">كود السيرفر:</label>
+    <input id="serverCode" type="text" class="w-full p-2 rounded bg-gray-700 text-white mb-4" placeholder="مثال: abcd1234">
+    <label class="block mb-2 text-lg">السكربت:</label>
+    <textarea id="scriptInput" rows="10" class="w-full p-2 rounded bg-gray-700 text-white mb-4" placeholder="اكتب سكربت Lua هنا..."></textarea>
+    <div class="flex gap-4 mb-4">
+      <button onclick="saveScript()" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">حفظ السكربت</button>
+      <button onclick="downloadScript()" class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded">تحميل السكربت</button>
+    </div>
+    <h2 class="text-xl font-semibold mb-2">السكربتات المحفوظة:</h2>
+    <ul id="savedScripts" class="space-y-2"></ul>
+  </div>
+</body>
+</html>
